@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        SLACK_WEBHOOK_URL = credentials('slack-webhook')
         GMAIL_CREDENTIALS = credentials('gmail-smtp-creds')
     }
 
@@ -22,40 +23,35 @@ pipeline {
             }
             steps {
                 echo 'Desplegando aplicación...'
-                // Aquí iría tu comando real de despliegue
             }
         }
     }
 
     post {
         success {
-            // Notificación por Slack (configurado globalmente)
-            slackSend (
-                channel: '#general',
-                message: "✅ Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
-		/*
-            // Notificación por correo
+            slackSend (webhookUrl: "${SLACK_WEBHOOK_URL}", message: "✅ Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            /*
             emailext (
                 subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "El build fue exitoso.",
-                to: "destinatario@gmail.com",
+                to: "andres.vazquezleon01@gmail.com, manuelf.linor@gmail.com",
                 from: "andres.vazquezleon01@gmail.com",
+                smtpHost: "smtp.gmail.com",
+                smtpPort: "587",
                 mimeType: 'text/plain'
             )
             */
         }
         failure {
-            slackSend (
-                channel: '#general',
-                message: "❌ Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-            )
-		/*
+            slackSend (webhookUrl: "${SLACK_WEBHOOK_URL}", message: "❌ Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            /*
             emailext (
                 subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "El build falló. Verifica los logs.",
-                to: "destinatario@gmail.com",
+                to: "andres.vazquezleon01@gmail.com, manuelf.linor@gmail.com",
                 from: "andres.vazquezleon01@gmail.com",
+                smtpHost: "smtp.gmail.com",
+                smtpPort: "587",
                 mimeType: 'text/plain'
             )
             */
