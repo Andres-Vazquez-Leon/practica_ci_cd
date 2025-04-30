@@ -33,8 +33,8 @@ pipeline {
             emailext (
                 subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "El build fue exitoso.",
-                to: "destinatario@gmail.com",
-                from: "${GMAIL_CREDENTIALS_USR}",
+                to: "andres.vazquezleon01@gmail.com, manuelf.linor@gmail.com",
+                from: "andres.vazquezleon01@gmail.com",
                 smtpHost: "smtp.gmail.com",
                 smtpPort: "587",
                 mimeType: 'text/plain'
@@ -45,8 +45,8 @@ pipeline {
             emailext (
                 subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "El build falló. Verifica los logs.",
-                to: "destinatario@gmail.com",
-                from: "${GMAIL_CREDENTIALS_USR}",
+                to: "andres.vazquezleon01@gmail.com, manuelf.linor@gmail.com",
+                from: "andres.vazquezleon01@gmail.com",
                 smtpHost: "smtp.gmail.com",
                 smtpPort: "587",
                 mimeType: 'text/plain'
