@@ -47,7 +47,7 @@ pipeline {
         }
         failure {
             slackSend (
-                channel: '#general',
+                channel: '#alertas',
                 message: "❌ Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
             )
 		/*
