@@ -31,7 +31,7 @@ pipeline {
         success {
             // Notificación por Slack (configurado globalmente)
             slackSend (
-                channel: '#general',
+                channel: '#alertas',
                 message: "✅ Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
             )
 		/*
