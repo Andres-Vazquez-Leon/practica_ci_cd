@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/tuusuario/tu-repo.git'
+                git 'https://github.com/Andres-Vazquez-Leon/practica_ci_cd.git'
             }
         }
         stage('Build & Test') {
@@ -30,6 +30,7 @@ pipeline {
     post {
         success {
             slackSend (webhookUrl: "${SLACK_WEBHOOK_URL}", message: "✅ Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            /*
             emailext (
                 subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "El build fue exitoso.",
@@ -39,9 +40,11 @@ pipeline {
                 smtpPort: "587",
                 mimeType: 'text/plain'
             )
+            */
         }
         failure {
             slackSend (webhookUrl: "${SLACK_WEBHOOK_URL}", message: "❌ Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            /*
             emailext (
                 subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "El build falló. Verifica los logs.",
@@ -51,6 +54,7 @@ pipeline {
                 smtpPort: "587",
                 mimeType: 'text/plain'
             )
+            */
         }
     }
 }
