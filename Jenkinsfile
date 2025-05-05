@@ -68,7 +68,7 @@ pipeline {
       // Notificación Slack
       slackSend(
         channel: SLACK_CHANNEL,
-        credentialsId: SLACK_CREDENTIALS,
+        CredentialId: SLACK_CREDENTIALS,                                          //
         color: 'good',
         message: "✅ Éxito: Job *${env.JOB_NAME}* #${env.BUILD_NUMBER} (branch: `${env.BRANCH_NAME}`)\n${env.BUILD_URL}"
       )
@@ -86,7 +86,7 @@ Más info: ${env.BUILD_URL}
       // No hay merge si falla
       slackSend(
         channel: SLACK_CHANNEL,
-        credentialsId: SLACK_CREDENTIALS,
+        CredentialId: SLACK_CREDENTIALS,                                         //
         color: 'danger',
         message: "❌ FALLO: Job *${env.JOB_NAME}* #${env.BUILD_NUMBER} (branch: `${env.BRANCH_NAME}`)\n${env.BUILD_URL}"
       )
