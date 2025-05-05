@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+
+    environment {
+        GMAIL_CREDENTIALS = credentials('gmail-smtp-creds')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/Andres-Vazquez-Leon/practica_ci_cd.git'
+            }
+        }
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+        stage('Deploy') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+steps {
+    echo 'Desplegando aplicación...'
+
+    // Configura usuario de Git (necesario si Jenkins no lo tiene)
+    sh '''
+        git config user.name "Andres"
+        git config user.email "andres.vazquezleon01@gmail.com"
+    '''
+
+    // Trae ramas remotas actualizadas
+    sh 'git fetch origin'
+
+    // Cambia a main
+    sh 'git checkout main'
+
+    // Actualiza main desde remoto
+    sh 'git pull origin main'
+
+    // Merge desde develop
+    sh 'git merge origin/develop'
+
+    // Push del merge a main
+    sh 'git push origin main'
+}
+        }
+    }
+
+    post {
+        success {
+            // Notificación por Slack (configurado globalmente)
+            slackSend (
+                channel: '#alertas',
+                message: "✅ Build exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            )
+		/*
+            // Notificación por correo
+            emailext (
+                subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "El build fue exitoso.",
+                to: "destinatario@gmail.com",
+                from: "andres.vazquezleon01@gmail.com",
+                mimeType: 'text/plain'
+            )
+            */
+        }
+        failure {
+            slackSend (
+                channel: '#alertas',
+                message: "❌ Build fallido: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            )
+		/*
+            emailext (
+                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "El build falló. Verifica los logs.",
+                to: "destinatario@gmail.com",
+                from: "andres.vazquezleon01@gmail.com",
+                mimeType: 'text/plain'
+            )
+            */
+        }
+    }
+}
