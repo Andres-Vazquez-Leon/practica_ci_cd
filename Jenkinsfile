@@ -23,7 +23,7 @@ pipeline {
     stage('Build & Test') {
       steps {
         // Ajusta al comando que uses, ej. mvn, gradle, npm...
-        sh './gradlew clean build'
+        sh 'mvn clean install'                                              //
       }
     }
 
