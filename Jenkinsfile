@@ -22,7 +22,7 @@ pipeline {
     stage('Build & Test') {
       steps {
         // Usa el comando apropiado para tu stack (por ejemplo npm, mvn...)
-        sh './gradlew clean build'
+        sh 'mvn clean install'
       }
     }
 
