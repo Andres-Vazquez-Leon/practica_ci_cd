@@ -45,10 +45,10 @@ pipeline {
             git config user.email "jenkins@ci"
 
             git remote set-url origin https://${env.GIT_CREDENTIALS}@github.com/${env.GIT_URL.replaceFirst('https://github.com/', '')}
-            git fetch origin main
-            git checkout main
+            git fetch origin master
+            git checkout master
             git merge --no-ff origin/${branchToMerge} -m "Auto merge from ${branchToMerge} via Jenkins"
-            git push origin main
+            git push origin master
           """
         }
       }
