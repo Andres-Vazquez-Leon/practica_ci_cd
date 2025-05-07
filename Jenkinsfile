@@ -29,7 +29,7 @@ pipeline {
       when {
         allOf {
           expression { currentBuild.currentResult == 'SUCCESS' }
-          expression { env.BRANCH_NAME != 'main' && env.BRANCH_NAME != 'master' }
+          expression { env.BRANCH_NAME != 'master' }
         }
       }
       steps {
