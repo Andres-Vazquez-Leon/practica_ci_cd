@@ -40,15 +40,15 @@ pipeline {
                 branch: 'master',
                 credentialsId: env.GIT_CREDENTIALS
 		}
-		withCredentials([string(credentialsId: env.GIT_CREDENTIALS, variable: 'GIT_TOKEN')]){
-            sh """
-              git config user.name "Andres-Vazque-Leon"
-              git config user.email "andres.vazquezleon01@gmail.com"
-              git fetch origin
-              git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into master [ci skip]"
-              git push origin master
-            """
-          }
+		withCredentials([string(credentialsId: env.GIT_CREDENTIALS, variable: 'GIT_TOKEN')]) {
+  sh """
+    git config user.name "Andres-Vazque-Leon"
+    git config user.email "andres.vazquezleon01@gmail.com"
+    git fetch origin
+    git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into master [ci skip]"
+    git push https://${GIT_TOKEN}@github.com/Andres-Vazquez-Leon/practica_ci_cd.git
+  """
+}
         }
       }
     }
