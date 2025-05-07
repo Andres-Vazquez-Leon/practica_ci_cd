@@ -39,8 +39,9 @@ pipeline {
             git url: scm.userRemoteConfigs[0].url,
                 branch: 'master',
                 credentialsId: env.GIT_CREDENTIALS
-
-            sh '''
+		}
+		withCredentials([string(credentialsId: env.GIT_CREDENTIALS, variable: 'GIT_TOKEN')]){
+            sh """
               git config user.name "Andres-Vazque-Leon"
               git config user.email "andres.vazquezleon01@gmail.com"
               git fetch origin
