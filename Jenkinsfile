@@ -37,7 +37,7 @@ pipeline {
           def branch = env.BRANCH_NAME
           dir('merge-workspace') {
             git url: scm.userRemoteConfigs[0].url,
-                branch: 'main',
+                branch: 'master',
                 credentialsId: env.GIT_CREDENTIALS
 
             sh '''
