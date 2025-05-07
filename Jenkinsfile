@@ -41,7 +41,7 @@ pipeline {
                 credentialsId: env.GIT_CREDENTIALS
 
             sh '''
-              git config user.name "Andres-Vazque-Leon"
+              git config user.name "Andres-Vazquez-Leon"
               git config user.email "andres.vazquezleon01@gmail.com"
               git fetch origin
               git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into master [ci skip]"
