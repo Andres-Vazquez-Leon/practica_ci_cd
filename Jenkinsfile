@@ -47,7 +47,7 @@ pipeline {
               git fetch origin
               git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into master [ci skip]"
               git push origin master
-            '''
+            """
           }
         }
       }
