@@ -1,16 +1,15 @@
 pipeline {
   agent any
 
-  /* (Opcional si usas Multibranch: Jenkins tomará la rama automáticamente) */
   triggers {
     githubPush()
   }
 
   environment {
-    GIT_CREDENTIALS    = 'token_clase'      // ID de tus credenciales Git en Jenkins
-    SLACK_CREDENTIALS  = 'slack-jenkins'       // ID del token de Slack en Jenkins
-    SLACK_CHANNEL      = '#alertas'             // Canal de Slack
-    EMAIL_RECIPIENTS   = 'andres.vazquezleon01@gmail.com, manuelf.linor@gmail.com' // Lista de correos, separados por comas
+    GIT_CREDENTIALS    = 'token_clase'
+    SLACK_CREDENTIALS  = 'slack-jenkins'
+    SLACK_CHANNEL      = '#alertas'
+    EMAIL_RECIPIENTS   = 'andres.vazquezleon01@gmail.com, manuelf.linor@gmail.com'
   }
 
   stages {
@@ -22,41 +21,32 @@ pipeline {
 
     stage('Build & Test') {
       steps {
-        // Ajusta al comando que uses, ej. mvn, gradle, npm...
-        sh 'mvn clean install'                                              //
+        sh 'mvn clean install'
       }
     }
 
-    stage('Merge to main') {
+    stage('Auto Merge to main') {
       when {
         allOf {
           expression { currentBuild.currentResult == 'SUCCESS' }
-          expression { env.BRANCH_NAME != 'master' }
+          expression { env.BRANCH_NAME != 'main' && env.BRANCH_NAME != 'master' }
         }
       }
       steps {
         script {
-          // Clona de nuevo la rama main
+          def branch = env.BRANCH_NAME
           dir('merge-workspace') {
             git url: scm.userRemoteConfigs[0].url,
-                credentialsId: GIT_CREDENTIALS,
-                branch: 'main'
-            // Configura usuario para el merge
+                branch: 'main',
+                credentialsId: env.GIT_CREDENTIALS
+
             sh '''
               git config user.name "Andres-Vazque-Leon"
               git config user.email "andres.vazquezleon01@gmail.com"
-              git merge origin/${BRANCH_NAME}
+              git fetch origin
+              git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into main [ci skip]"
+              git push origin main
             '''
-            // Empuja el merge
-            withCredentials([usernamePassword(
-              credentialsId: GIT_CREDENTIALS,
-              usernameVariable: 'GIT_USER',
-              passwordVariable: 'GIT_PASS'
-            )]) {
-              sh '''
-                git push https://${GIT_USER}:${GIT_PASS}@${scm.userRemoteConfigs[0].url.replace('https://','')} main
-              '''
-            }
           }
         }
       }
@@ -65,38 +55,27 @@ pipeline {
 
   post {
     success {
-      // Notificación Slack
-      slackSend(
-        channel: SLACK_CHANNEL,
-        tokenCredentialId: SLACK_CREDENTIALS,                                          //
+      slackSend (
+        channel: env.SLACK_CHANNEL,
         color: 'good',
-        message: "✅ Éxito: Job *${env.JOB_NAME}* #${env.BUILD_NUMBER} (branch: `${env.BRANCH_NAME}`)\n${env.BUILD_URL}"
+        message: "✅ Éxito en ${env.JOB_NAME} #${env.BUILD_NUMBER} en rama ${env.BRANCH_NAME}.\nVer detalles: ${env.BUILD_URL}",
+        tokenCredentialId: env.SLACK_CREDENTIALS
       )
-      // Notificación correo
-      emailext(
-        to:      EMAIL_RECIPIENTS,
-        subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-        body:    """La compilación *fue exitosa* en rama `${env.BRANCH_NAME}`.
-Más info: ${env.BUILD_URL}
-"""
-      )
+      mail to: env.EMAIL_RECIPIENTS,
+           subject: "✔️ Pipeline exitoso en ${env.BRANCH_NAME}",
+           body: "El build fue exitoso.\n\nVer detalles: ${env.BUILD_URL}"
     }
 
     failure {
-      // No hay merge si falla
-      slackSend(
-        channel: SLACK_CHANNEL,
-        tokenCredentialId: SLACK_CREDENTIALS,                                         //
+      slackSend (
+        channel: env.SLACK_CHANNEL,
         color: 'danger',
-        message: "❌ FALLO: Job *${env.JOB_NAME}* #${env.BUILD_NUMBER} (branch: `${env.BRANCH_NAME}`)\n${env.BUILD_URL}"
+        message: "❌ Falló ${env.JOB_NAME} #${env.BUILD_NUMBER} en rama ${env.BRANCH_NAME}.\nVer detalles: ${env.BUILD_URL}",
+        tokenCredentialId: env.SLACK_CREDENTIALS
       )
-      emailext(
-        to:      EMAIL_RECIPIENTS,
-        subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-        body:    """La compilación *ha fallado* en rama `${env.BRANCH_NAME}`.
-Por favor revisa los logs: ${env.BUILD_URL}
-"""
-      )
+      mail to: env.EMAIL_RECIPIENTS,
+           subject: "❌ Falló el pipeline en ${env.BRANCH_NAME}",
+           body: "El build falló.\n\nVer detalles: ${env.BUILD_URL}"
     }
   }
 }
