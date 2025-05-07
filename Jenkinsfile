@@ -29,7 +29,7 @@ pipeline {
       when {
         allOf {
           expression { currentBuild.currentResult == 'SUCCESS' }
-          expression { env.BRANCH_NAME != 'main' && env.BRANCH_NAME != 'master' }
+          expression { env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'master' }
         }
       }
       steps {
@@ -44,8 +44,8 @@ pipeline {
               git config user.name "Andres-Vazque-Leon"
               git config user.email "andres.vazquezleon01@gmail.com"
               git fetch origin
-              git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into main [ci skip]"
-              git push origin main
+              git merge --no-ff origin/${BRANCH_NAME} -m "Auto-merge ${BRANCH_NAME} into master [ci skip]"
+              git push origin master
             '''
           }
         }
